@@ -1,19 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import DeckBuilder from './components/DeckBuilder';  // Certifique-se de que o caminho está correto
-import Deck from './pages/Deck';
-import NotFound from './pages/NotFound';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Menu from './components/Menu/Menu';
+import Home from './pages/Home'
+import Decks from './pages/Decks'
+import DeckBuilder from './components/DeckBuilder';
+
+
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/deck-builder" element={<DeckBuilder />} />
-        <Route path="/decks" element={<Deck />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Menu>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/deck-builder" element={<DeckBuilder />} />
+          <Route path="/decks" element={<Decks />} />
+        </Routes>
+      </Menu>
     </Router>
   );
 }
