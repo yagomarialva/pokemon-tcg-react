@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import { getCards } from '../services/api';
+import React, { useState, useEffect } from "react";
+import { getCards } from "../services/api";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 const DeckBuilder = () => {
   const [cards, setCards] = useState([]);
   const [deck, setDeck] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Função para recuperar o deck do localStorage
   const loadDeck = () => {
@@ -23,7 +30,6 @@ const DeckBuilder = () => {
   const fetchCards = async () => {
     try {
       const result = await getCards();
-      console.log(result)
       setCards(result.data); // Supondo que o resultado esteja em `result.data`
     } catch (error) {
       console.error(error);
@@ -35,46 +41,55 @@ const DeckBuilder = () => {
     loadDeck(); // Carrega o deck quando o componente é montado
   }, []);
 
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    {
-      field: 'image',
-      headerName: 'Image',
-      width: 150,
-      renderCell: (params) => <img src={params.row.images.large} alt={params.row.name} style={{ width: '100%' }} />,
-    },
-    { field: 'name', headerName: 'Name', width: 150 },
-    { field: 'supertype', headerName: 'Tipo', width: 150 },
-    { field: 'artist', headerName: 'Artista', width: 150 },
-    { field: 'hp', headerName: 'HP', width: 150 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 150,
-      renderCell: (params) => (
-        <button onClick={() => handleAddCard(params.row)}>Add to Deck</button>
-      ),
-    },
-  ];
+  // Filtrando os cards com base no termo de pesquisa
+  const filteredCards = cards.filter((card) =>
+    card.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
       <h1>Deck Builder</h1>
-      <div style={{ height: '50%', width: '100%' }}>
-        <DataGrid
-          rows={cards}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
-          getRowId={(row) => row.id} // Certifica-se de que a DataGrid saiba como identificar cada linha
-        />
-      </div>
-      {/* <h2>My Deck</h2>
-      <ul>
-        {deck.map((card) => (
-          <li key={card.id}>{card.name}</li>
+      <input
+        type="text"
+        placeholder="Search by name..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          mr:20,
+          gap: 2,
+          justifyContent: "center",
+          mt: 2
+        }}
+      >
+        {filteredCards.map((card) => (
+          <Card key={card.id} sx={{ width: 350 }}>
+            <CardMedia
+              sx={{ height: 500 }}
+              image={card.images.small}
+              title={card.name}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="div">
+                {card.name}
+              </Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                Tipo: {card.supertype}
+                <br />
+                HP: {card.hp}
+                <br />
+                Artista: {card.artist}
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button size="small" onClick={() => handleAddCard(card)}>Add to Deck</Button>
+            </CardActions>
+          </Card>
         ))}
-      </ul> */}
+      </Box>
     </div>
   );
 };
